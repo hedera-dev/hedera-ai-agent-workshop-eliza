@@ -1,32 +1,42 @@
 # Configuration for gitpod.io
 # To run on gitpod open https://gitpod.io/?autostart=false# followed by the github URL of your project
 # e.g. https://gitpod.io/?autostart=false#https://github.com/hedera-dev/hedera-tutorial-demo-base-template
+image: gitpod/workspace-full
+
 tasks:
-  - name: 'get_deps'
+  - name: Setup Environment for Eliza Plugin
     init: |
-      bash ./util/03-get-dependencies.sh
-  - name: 'rpcrelay_run'
-    init: |
-      gp sync-await main
-      bash ./util/04-rpcrelay-run.sh
-  - name: 'main'
-    init: |
-      (
-        set -e
-        export RPC_URL=$( gp url 7546 )
-        bash ./util/00-main.sh
-        gp sync-done main
-      )
+      cd eliza-hedera
+      # Copy .env.example to .env if not already present
+      if [ ! -f .env ]; then
+        cp .env.example .env
+      fi
+      echo "Enter your OpenAI API Key:"
+      read -r OPENAI_API_KEY
+      echo "Enter your HEDERA_PRIVATE_KEY:"
+      read -r HEDERA_PRIVATE_KEY
+      # Update .env file with the provided API keys
+      if grep -q "^OPENAI_API_KEY=" .env; then
+        sed -i "s|^OPENAI_API_KEY=.*|OPENAI_API_KEY=$OPENAI_API_KEY|" .env
+      else
+        echo "OPENAI_API_KEY=$OPENAI_API_KEY" >> .env
+      fi
+      if grep -q "^HEDERA_PRIVATE_KEY=" .env; then
+        sed -i "s|^HEDERA_PRIVATE_KEY=.*|HEDERA_PRIVATE_KEY=$HEDERA_PRIVATE_KEY|" .env
+      else
+        echo "HEDERA_PRIVATE_KEY=$HEDERA_PRIVATE_KEY" >> .env
+      fi
+
+  - name: Start Eliza Plugin Backend
+    command: |
+      cd eliza-hedera && pnpm install --no-frozen-lockfile && pnpm build && pnpm start --characters="characters/trump.character.json"
+    
+  - name: Start Eliza Plugin Client UI
+    command: |
+      cd eliza-hedera && pnpm start:client
+
 ports:
-  - name: 'rpcrelay'
-    onOpen: notify
-    port: 7546
-    visibility: public
-  - name: 'rpcrelay_ws'
-    onOpen: ignore
-    port: 8546
-    visibility: public
-  - name: 'rpcrelay_admin'
-    onOpen: ignore
-    port: 8547
-    visibility: public
+  - port: 3000
+    onOpen: open-preview
+  - port: 5173
+    onOpen: open-preview
