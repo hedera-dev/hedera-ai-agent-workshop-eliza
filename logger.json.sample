@@ -1,0 +1,12 @@
+{
+  "config": {
+    "scriptCategory": "config",
+    "ansiDisabled": false,
+    "metricsId": "",
+    "metricsHcsTopicId": "0.0.5504237",
+    "metricsHcsTopicMemo": "aiAgentsWorkshopV1",
+    "metricsAccountId": "",
+    "metricsAccountKey": "",
+    "metricsHcsDisabled": false
+  }
+}

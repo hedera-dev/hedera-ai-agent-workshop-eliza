@@ -1,0 +1,33 @@
+{
+  "name": "hedera-ai-agent-workshop",
+  "private": true,
+  "version": "0.0.0",
+  "description": "AI and agents workshop on Hedera",
+  "main": "init.js",
+  "scripts": {
+    "update-from-base-template": "npx github:hedera-dev/hedera-tutorial-demo-base-template update",
+    "scaffold-task-from-base-template": "npx github:hedera-dev/hedera-tutorial-demo-base-template scaffold-task",
+    "format": "prettier . --write --cache",
+    "test": "echo 'no tests yet'",
+    "prepare": "husky"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hedera-dev/hedera-ai-agent-workshop.git"
+  },
+  "keywords": ["hedera", "ai", "agent", "workshop"],
+  "author": "bguiz",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/hedera-dev/hedera-ai-agent-workshop/issues"
+  },
+  "homepage": "https://github.com/hedera-dev/hedera-ai-agent-workshop#readme",
+  "dependencies": {
+    "@hashgraph/sdk": "2.58.0",
+    "dotenv": "16.4.5"
+  },
+  "devDependencies": {
+    "husky": "9.1.4",
+    "prettier": "3.3.3"
+  }
+}
