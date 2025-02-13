@@ -48,9 +48,9 @@ tasks:
         echo "HEDERA_KEY_TYPE=$HEDERA_KEY_TYPE" >> .env
       fi
     command: |
-      cd eliza-hedera && pnpm install --no-frozen-lockfile && pnpm build && pnpm start --characters="characters/trump.character.json" &
+      pnpm install --no-frozen-lockfile && pnpm build && pnpm start --characters="characters/trump.character.json" &
       sleep 2
-      cd eliza-hedera && pnpm start:client
+      pnpm start:client
 
 ports:
   - port: 3000
