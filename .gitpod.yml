@@ -4,7 +4,7 @@
 image: gitpod/workspace-full
 
 tasks:
-  - name: Setup and Start Eliza Plugin
+  - name: config_eliza
     init: |
       cd eliza-hedera
       # Copy .env.example to .env if not present
@@ -47,17 +47,32 @@ tasks:
       else
         echo "HEDERA_KEY_TYPE=$HEDERA_KEY_TYPE" >> .env
       fi
-    command: |
-      pnpm install --no-frozen-lockfile && pnpm build && pnpm start --characters="characters/trump.character.json" &
-      sleep 2
-      pnpm start:client
+      gp sync-done config_eliza
+  - name: install_eliza
+    init: |
+      cd eliza-hedera
+      pnpm install --no-frozen-lockfile && pnpm build
+      gp sync-done install_eliza
+  - name: run_eliza
+    init: |
+      cd eliza-hedera
+      gp sync-await config_eliza
+      gp sync-await install_eliza
+      pnpm start --characters="characters/hedera.character.json" &
+      gp sync-done run_eliza
+  - name: run_client_eliza
+    init: |
+      cd eliza-hedera
+      gp sync-await run_eliza
+      sleep 10 && pnpm start:client --host
+      gp sync-done run_client_eliza
 
 ports:
   - port: 3000
-    protocol: https
+    protocol: http
     visibility: public
-    onOpen: open-preview
+    onOpen: notify
   - port: 5173
-    protocol: https
+    protocol: http
     visibility: public
-    onOpen: open-preview
+    onOpen: open-browser
