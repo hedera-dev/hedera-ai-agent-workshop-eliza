@@ -54,6 +54,10 @@ tasks:
 
 ports:
   - port: 3000
+    protocol: https
+    visibility: public
     onOpen: open-preview
   - port: 5173
+    protocol: https
+    visibility: public
     onOpen: open-preview
