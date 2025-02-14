@@ -2,8 +2,6 @@ import { type UUID, type Character } from "@elizaos/core";
 
 const BASE_URL = import.meta.env.VITE_API_URL;
 
-console.log("BASE_URL", BASE_URL);
-
 const fetcher = async ({
     url,
     method,
