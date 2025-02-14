@@ -64,7 +64,7 @@ tasks:
     init: |
       cd eliza-hedera
       gp sync-await run_eliza
-      sleep 10 && pnpm start:client --host
+      sleep 10 && VITE_API_URL="$(gp url 3000)" pnpm start:client
       gp sync-done run_client_eliza
 
 ports:

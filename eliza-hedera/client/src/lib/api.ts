@@ -1,6 +1,8 @@
 import { type UUID, type Character } from "@elizaos/core";
 
-const BASE_URL = "http://localhost:3000";
+const BASE_URL = import.meta.env.VITE_API_URL;
+
+console.log("BASE_URL", BASE_URL);
 
 const fetcher = async ({
     url,
@@ -18,9 +20,9 @@ const fetcher = async ({
         headers: headers
             ? headers
             : {
-                  Accept: "application/json",
-                  "Content-Type": "application/json",
-              },
+                Accept: "application/json",
+                "Content-Type": "application/json",
+            },
     };
 
     if (method === "POST") {
