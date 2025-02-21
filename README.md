@@ -2,16 +2,6 @@
 
 Demo repo for the Hedera AI and agents workshop.
 
-<a href="https://gitpod.io/?autostart=true&editor=code&workspaceClass=g1-standard#https://github.com/hedera-dev/hedera-ai-agent-workshop" target="_blank" rel="noreferrer">
-  <img src="./img/gitpod-open-button.svg" />
-</a>
-
-To follow along, please read the **accompanying tutorial** at [docs.hedera.com](#TODO_TUTORIAL_ROOT_LINK) (WIP).
-
-> ⚠️ NOTE that this repo is still a work in progress,
-> and is therefore incomplete.
-> Sections are explicitly marked `(WIP)` as markers/ reminders.
-
 ## How to run using Gitpod
 
 To run on Gitpod (a cloud development environment), click the button below:
