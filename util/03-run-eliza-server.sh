@@ -3,6 +3,6 @@
 set -e
 
 DIR="$( dirname -- "${BASH_SOURCE[0]}"; )";
-cd ${DIR}/../eliza-hedera
+cd ${DIR}/../eliza
 
 pnpm start --characters="characters/hedera.character.json" &

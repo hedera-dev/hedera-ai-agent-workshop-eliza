@@ -3,7 +3,7 @@
 set -e
 
 DIR="$( dirname -- "${BASH_SOURCE[0]}"; )";
-cd ${DIR}/../eliza-hedera
+cd ${DIR}/../eliza
 
 # Copy .env.example to .env if not present
 if [ ! -f .env ]; then
