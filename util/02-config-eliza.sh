@@ -15,8 +15,6 @@ echo "Enter your HEDERA_ACCOUNT_ID:"
 read -r HEDERA_ACCOUNT_ID
 echo "Enter your HEDERA_PRIVATE_KEY:"
 read -r HEDERA_PRIVATE_KEY
-echo "Enter your HEDERA_NETWORK_TYPE (testnet or mainnet):"
-read -r HEDERA_NETWORK_TYPE
 echo "Enter your HEDERA_KEY_TYPE (ECDSA or ED25519):"
 read -r HEDERA_KEY_TYPE
 
