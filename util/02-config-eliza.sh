@@ -21,10 +21,10 @@ echo "Enter your HEDERA_KEY_TYPE (ECDSA or ED25519):"
 read -r HEDERA_KEY_TYPE
 
 # Update .env file with the provided variables
-if grep -q "^OPENAI_API_KEY=" .env ; then
-  sed -i~ "s|^OPENAI_API_KEY=.*|OPENAI_API_KEY=$OPENAI_API_KEY|" .env
+if grep -q "^OPENROUTER_API_KEY=" .env ; then
+  sed -i~ "s|^OPENROUTER_API_KEY=.*|OPENROUTER_API_KEY=$OPENROUTER_API_KEY|" .env
 else
-  echo "OPENAI_API_KEY=$OPENAI_API_KEY" >> .env
+  echo "OPENROUTER_API_KEY=$OPENROUTER_API_KEY" >> .env
 fi
 if grep -q "^HEDERA_ACCOUNT_ID=" .env ; then
   sed -i~  "s|^HEDERA_ACCOUNT_ID=.*|HEDERA_ACCOUNT_ID=$HEDERA_ACCOUNT_ID|" .env
