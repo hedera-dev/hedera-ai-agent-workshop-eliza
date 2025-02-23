@@ -36,11 +36,7 @@ if grep -q "^HEDERA_PRIVATE_KEY=" .env ; then
 else
   echo "HEDERA_PRIVATE_KEY=$HEDERA_PRIVATE_KEY" >> .env
 fi
-if grep -q "^HEDERA_NETWORK_TYPE=" .env ; then
-  sed -i~  "s|^HEDERA_NETWORK_TYPE=.*|HEDERA_NETWORK_TYPE=$HEDERA_NETWORK_TYPE|" .env
-else
-  echo "HEDERA_NETWORK_TYPE=$HEDERA_NETWORK_TYPE" >> .env
-fi
+  echo "HEDERA_NETWORK_TYPE=testnet" >> .env
 if grep -q "^HEDERA_KEY_TYPE=" .env ; then
   sed -i~  "s|^HEDERA_KEY_TYPE=.*|HEDERA_KEY_TYPE=$HEDERA_KEY_TYPE|" .env
 else
