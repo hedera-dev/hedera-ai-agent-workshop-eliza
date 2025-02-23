@@ -9,8 +9,8 @@ cd ${DIR}/../eliza
 if [ ! -f .env ]; then
   cp .env.example .env
 fi
-echo "Enter your OpenAI API Key:"
-read -r OPENAI_API_KEY
+echo "Enter your OPENROUTER API Key:"
+read -r OPENROUTER_API_KEY
 echo "Enter your HEDERA_ACCOUNT_ID:"
 read -r HEDERA_ACCOUNT_ID
 echo "Enter your HEDERA_PRIVATE_KEY:"
