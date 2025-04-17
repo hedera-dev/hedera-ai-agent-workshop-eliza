@@ -23,7 +23,7 @@
         "@elizaos/plugin-node": "workspace:*",
         "@elizaos/client-direct": "workspace:*",
         "@elizaos/plugin-di": "workspace:*",
-        "@elizaos/plugin-hedera": "file:../../hedera-plugin-eliza",
+        "@elizaos/plugin-hedera": "github:hedera-dev/eliza-plugin-hedera#main",
         "readline": "1.3.0",
         "ws": "8.18.0",
         "yargs": "17.7.2"
