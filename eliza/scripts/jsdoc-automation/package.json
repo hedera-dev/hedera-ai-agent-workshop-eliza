@@ -17,13 +17,13 @@
     "license": "MIT",
     "dependencies": {
         "@langchain/openai": "^0.3.16",
-        "@octokit/rest": "^21.0.2",
+        "@octokit/rest": "^21.1.0",
         "@types/node": "^20.11.0",
         "@typescript-eslint/parser": "6.18.1",
         "@typescript-eslint/types": "6.18.1",
         "@typescript-eslint/typescript-estree": "6.18.1",
         "dotenv": "^16.4.7",
-        "langchain": "^0.3.7",
+        "langchain": "^0.3.11",
         "yaml": "^2.3.4"
     },
     "devDependencies": {

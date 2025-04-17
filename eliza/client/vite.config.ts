@@ -8,9 +8,6 @@ export default defineConfig(({ mode }) => {
     const envDir = path.resolve(__dirname, "..");
     const env = loadEnv(mode, envDir, "");
     return {
-        server: {
-            allowedHosts: true
-        },
         plugins: [
             react(),
             viteCompression({
@@ -25,6 +22,12 @@ export default defineConfig(({ mode }) => {
             "import.meta.env.VITE_SERVER_PORT": JSON.stringify(
                 env.SERVER_PORT || "3000"
             ),
+            "import.meta.env.VITE_SERVER_URL": JSON.stringify(
+                env.SERVER_URL || "http://localhost"
+            ),
+            "import.meta.env.VITE_SERVER_BASE_URL": JSON.stringify(
+                env.SERVER_BASE_URL
+            )
         },
         build: {
             outDir: "dist",
