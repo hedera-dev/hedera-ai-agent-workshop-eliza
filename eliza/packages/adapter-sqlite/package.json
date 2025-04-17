@@ -1,6 +1,6 @@
 {
-    "name": "@elizaos/adapter-sqlite",
-    "version": "0.25.6-alpha.1",
+    "name": "@elizaos-plugins/adapter-sqlite",
+    "version": "0.25.9",
     "type": "module",
     "main": "dist/index.js",
     "module": "dist/index.js",
@@ -22,9 +22,11 @@
         "@elizaos/core": "workspace:*",
         "@types/better-sqlite3": "7.6.12",
         "better-sqlite3": "11.8.1",
-        "sqlite-vec": "0.1.6"
+        "sqlite-vec": "0.1.6",
+        "uuid": "11.0.5"
     },
     "devDependencies": {
+        "@types/uuid": "10.0.0",
         "tsup": "8.3.5",
         "vitest": "^3.0.2",
         "@vitest/coverage-v8": "^3.0.2"

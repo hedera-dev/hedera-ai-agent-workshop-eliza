@@ -8,7 +8,6 @@ import {
     formatActions,
 } from "./actions.ts";
 import { addHeader, composeContext } from "./context.ts";
-import { defaultCharacter } from "./defaultCharacter.ts";
 import {
     evaluationTemplate,
     formatEvaluatorExamples,
@@ -35,7 +34,7 @@ import {
     type IDatabaseAdapter,
     type IMemoryManager,
     type IRAGKnowledgeManager,
-    type IVerifiableInferenceAdapter,
+    // type IVerifiableInferenceAdapter,
     type KnowledgeItem,
     // RAGKnowledgeItem,
     //Media,
@@ -43,6 +42,7 @@ import {
     ModelProviderName,
     type Plugin,
     type Provider,
+    type Adapter,
     type Service,
     type ServiceType,
     type State,
@@ -52,6 +52,7 @@ import {
     type Evaluator,
     type Memory,
     type DirectoryItem,
+    type ClientInstance,
 } from "./types.ts";
 import { stringToUuid } from "./uuid.ts";
 import { glob } from "glob";
@@ -109,6 +110,11 @@ export class AgentRuntime implements IAgentRuntime {
      * Context providers used to provide context for message generation.
      */
     providers: Provider[] = [];
+
+    /**
+     * Database adapters used to interact with the database.
+     */
+    adapters: Adapter[] = [];
 
     plugins: Plugin[] = [];
 
@@ -170,9 +176,9 @@ export class AgentRuntime implements IAgentRuntime {
     services: Map<ServiceType, Service> = new Map();
     memoryManagers: Map<string, IMemoryManager> = new Map();
     cacheManager: ICacheManager;
-    clients: Record<string, any>;
+    clients: ClientInstance[] = [];
 
-    verifiableInferenceAdapter?: IVerifiableInferenceAdapter;
+    // verifiableInferenceAdapter?: IVerifiableInferenceAdapter;
 
     registerMemoryManager(manager: IMemoryManager): void {
         if (!manager.tableName) {
@@ -250,19 +256,23 @@ export class AgentRuntime implements IAgentRuntime {
 
         services?: Service[]; // Map of service name to service instance
         managers?: IMemoryManager[]; // Map of table name to memory manager
-        databaseAdapter: IDatabaseAdapter; // The database adapter used for interacting with the database
+        databaseAdapter?: IDatabaseAdapter; // The database adapter used for interacting with the database
         fetch?: typeof fetch | unknown;
         speechModelPath?: string;
-        cacheManager: ICacheManager;
+        cacheManager?: ICacheManager;
         logging?: boolean;
-        verifiableInferenceAdapter?: IVerifiableInferenceAdapter;
+        // verifiableInferenceAdapter?: IVerifiableInferenceAdapter;
     }) {
         // use the character id if it exists, otherwise use the agentId if it is passed in, otherwise use the character name
         this.agentId =
             opts.character?.id ??
             opts?.agentId ??
             stringToUuid(opts.character?.name ?? uuidv4());
-        this.character = opts.character || defaultCharacter;
+        this.character = opts.character;
+
+        if(!this.character) {
+            throw new Error("Character input is required");
+        }
 
         elizaLogger.info(`${this.character.name}(${this.agentId}) - Initializing AgentRuntime with options:`, {
             character: opts.character?.name,
@@ -289,22 +299,7 @@ export class AgentRuntime implements IAgentRuntime {
         this.#conversationLength =
             opts.conversationLength ?? this.#conversationLength;
 
-        if (!opts.databaseAdapter) {
-            throw new Error("No database adapter provided");
-        }
         this.databaseAdapter = opts.databaseAdapter;
-
-        // By convention, we create a user and room using the agent id.
-        // Memories related to it are considered global context for the agent.
-        this.ensureRoomExists(this.agentId);
-        this.ensureUserExists(
-            this.agentId,
-            this.character.username || this.character.name,
-            this.character.name,
-        ).then(() => {
-            // postgres needs the user to exist before you can add a participant
-            this.ensureParticipantExists(this.agentId, this.agentId);
-        });
 
         elizaLogger.success(`Agent ID: ${this.agentId}`);
 
@@ -426,6 +421,10 @@ export class AgentRuntime implements IAgentRuntime {
             plugin.providers?.forEach((provider) => {
                 this.registerContextProvider(provider);
             });
+
+            plugin.adapters?.forEach((adapter) => {
+                this.registerAdapter(adapter);
+            });
         });
 
         (opts.actions ?? []).forEach((action) => {
@@ -440,10 +439,26 @@ export class AgentRuntime implements IAgentRuntime {
             this.registerEvaluator(evaluator);
         });
 
-        this.verifiableInferenceAdapter = opts.verifiableInferenceAdapter;
+        // this.verifiableInferenceAdapter = opts.verifiableInferenceAdapter;
+    }
+
+    private async initializeDatabase() {
+        // By convention, we create a user and room using the agent id.
+        // Memories related to it are considered global context for the agent.
+        this.ensureRoomExists(this.agentId);
+        this.ensureUserExists(
+            this.agentId,
+            this.character.username || this.character.name,
+            this.character.name,
+        ).then(() => {
+            // postgres needs the user to exist before you can add a participant
+            this.ensureParticipantExists(this.agentId, this.agentId);
+        });
     }
 
     async initialize() {
+        this.initializeDatabase();
+
         for (const [serviceType, service] of this.services.entries()) {
             try {
                 await service.initialize(this);
@@ -543,7 +558,7 @@ export class AgentRuntime implements IAgentRuntime {
                     elizaLogger.info(
                         `[RAG Process] Processing direct string knowledge`,
                     );
-                    await this.processCharacterKnowledge(stringKnowledge);
+                    await this.processCharacterRAGKnowledge(stringKnowledge);
                 }
             } else {
                 // Non-RAG mode: only process string knowledge
@@ -572,15 +587,14 @@ export class AgentRuntime implements IAgentRuntime {
         // services (just initialized), clients
 
         // client have a start
-        for (const cStr in this.clients) {
-            const c = this.clients[cStr];
+        for (const c of this.clients) {
             elizaLogger.log(
                 "runtime::stop - requesting",
-                cStr,
+                c,
                 "client stop for",
                 this.character.name,
             );
-            c.stop();
+            c.stop(this);
         }
         // we don't need to unregister with directClient
         // don't need to worry about knowledge
@@ -980,6 +994,14 @@ export class AgentRuntime implements IAgentRuntime {
     }
 
     /**
+     * Register an adapter for the agent to use.
+     * @param adapter The adapter to register.
+     */
+    registerAdapter(adapter: Adapter) {
+        this.adapters.push(adapter);
+    }
+
+    /**
      * Process the actions of a message.
      * @param message The message to process.
      * @param content The content of the message to process actions from.
@@ -1116,7 +1138,7 @@ export class AgentRuntime implements IAgentRuntime {
             runtime: this,
             context,
             modelClass: ModelClass.SMALL,
-            verifiableInferenceAdapter: this.verifiableInferenceAdapter,
+            // verifiableInferenceAdapter: this.verifiableInferenceAdapter,
         });
 
         const evaluators = parseJsonArrayFromText(
@@ -1167,8 +1189,14 @@ export class AgentRuntime implements IAgentRuntime {
                 id: userId,
                 name: name || this.character.name || "Unknown User",
                 username: userName || this.character.username || "Unknown",
-                email: email || this.character.email || userId, // Temporary
-                details: this.character || { summary: "" },
+                // TODO: We might not need these account pieces
+                email: email || this.character.email || userId,
+                // When invoke ensureUserExists and saving account.details
+                // Performing a complete JSON.stringify on character will cause a TypeError: Converting circular structure to JSON error in some more complex plugins.
+                details: this.character ? Object.assign({}, this.character, {
+                    source,
+                    plugins: this.character?.plugins?.map((plugin) => plugin.name),
+                }) : { summary: "" },
             });
             elizaLogger.success(`User ${userName} created successfully.`);
         }
@@ -1760,14 +1788,6 @@ Text: ${attachment.text}
             recentMessagesData,
             attachments: formattedAttachments,
         } as State;
-    }
-
-    getVerifiableInferenceAdapter(): IVerifiableInferenceAdapter | undefined {
-        return this.verifiableInferenceAdapter;
-    }
-
-    setVerifiableInferenceAdapter(adapter: IVerifiableInferenceAdapter): void {
-        this.verifiableInferenceAdapter = adapter;
     }
 }
 
