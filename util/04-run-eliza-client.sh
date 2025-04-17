@@ -11,5 +11,9 @@ if ! command -v gp 2>&1 >/dev/null ; then
   pnpm start:client
 else
   # Running in gitpod
+<<<<<<< HEAD
   SERVER_BASE_URL="$(gp url 3000)" pnpm start:client
+=======
+  VITE_SERVER_BASE_URL="$(gp url 3000)" pnpm start:client
+>>>>>>> 712d402205a5acea0ce1c417b37bc906414c8d3e
 fi

@@ -15,6 +15,8 @@ echo "Enter your HEDERA_ACCOUNT_ID:"
 read -r HEDERA_ACCOUNT_ID
 echo "Enter your HEDERA_PRIVATE_KEY:"
 read -r HEDERA_PRIVATE_KEY
+echo "Enter your HEDERA_PUBLIC_KEY:"
+read -r HEDERA_PUBLIC_KEY
 echo "Enter your HEDERA_KEY_TYPE (ECDSA or ED25519):"
 read -r HEDERA_KEY_TYPE
 
@@ -34,7 +36,12 @@ if grep -q "^HEDERA_PRIVATE_KEY=" .env ; then
 else
   echo "HEDERA_PRIVATE_KEY=$HEDERA_PRIVATE_KEY" >> .env
 fi
-  echo "HEDERA_NETWORK_TYPE=testnet" >> .env
+if grep -q "^HEDERA_PUBLIC_KEY=" .env ; then
+  sed -i~  "s|^HEDERA_PUBLIC_KEY=.*|HEDERA_PUBLIC_KEY=$HEDERA_PUBLIC_KEY|" .env
+else
+  echo "HEDERA_PUBLIC_KEY=$HEDERA_PUBLIC_KEY" >> .env
+fi
+echo "HEDERA_NETWORK_TYPE=testnet" >> .env
 if grep -q "^HEDERA_KEY_TYPE=" .env ; then
   sed -i~  "s|^HEDERA_KEY_TYPE=.*|HEDERA_KEY_TYPE=$HEDERA_KEY_TYPE|" .env
 else

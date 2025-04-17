@@ -22,7 +22,7 @@ const TWEETS_FILE = "tweets.json";
             console.log("Logged in successfully!");
 
             // Fetch all tweets for the user "@realdonaldtrump"
-            const tweets = scraper.getTweets("pmarca", 2000);
+            const tweets = await scraper.getTweets("pmarca", 2000);
 
             // Initialize an empty array to store the fetched tweets
             let fetchedTweets = [];
