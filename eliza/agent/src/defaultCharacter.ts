@@ -5,7 +5,7 @@ export const defaultCharacter: Character = {
     name: "Hedera Helper",
     plugins: [hederaPlugin],
     clients: [],
-    modelProvider: ModelProviderName.OPENAI,
+    modelProvider: ModelProviderName.OPENROUTER,
     settings: {
         secrets: {},
         voice: {
